@@ -9,7 +9,7 @@
     <script src="js/data.js"></script>
     <script src="https://unpkg.com/vue"></script>
 </head>
-<body>
+<body onresize="resize()">
 
     <div id="app">
         <h2>Super Value 30 Package Music List</h2>
@@ -23,8 +23,13 @@
         <br>
         <br>
         <div style="background: #29282d;">
-            <ul style="width: 900px; margin-left: auto; margin-right: auto;">
-                <li style="display: block; padding: 5px 3px; margin-bottom: 20px; font-size: 25px; color: #fff; border-bottom: 1px solid #121116; box-shadow: 0 2px 0 #36353a;">구입할 30곡을 선택해 주세요.</li>
+            <ul style="min-width: 340px; margin-left: auto; margin-right: auto;"
+                :style="{ width: (view_width>=900?'900px':(view_width-100)+'px') }">
+                <li
+                        style="display: block; padding: 5px 3px; margin-bottom: 20px; font-size: 25px; color: #fff; border-bottom: 1px solid #121116; box-shadow: 0 2px 0 #36353a;"
+                        :style="{ width: (view_width>=900?'900px':(view_width-100)+'px') }">
+                    구입할 30곡을 선택해 주세요.
+                </li>
                 <li v-for="(music, idx) in music_list" :id="music.id" style="display: inline-block; margin: 10px; width: 270px; height: 60px;">
                     <div
                             style="display: inline-block; width: 34px; height: 34px;"
@@ -52,6 +57,13 @@
 
 
     <script>
+        var width = (window.hasOwnProperty('innerWidth')?window.innerWidth:document.body.offsetWidth);
+
+        function resize() {
+            width = (window.hasOwnProperty('innerWidth')?window.innerWidth:document.body.offsetWidth);
+            app.view_width = width;
+        }
+
         Vue.component('ab-music-card', {
             props: ['music', 'idx'],
             data: function() {
@@ -102,6 +114,7 @@
             data: {
                 music_list: music_pkg.pack_3,
                 select_count: 0,
+                view_width: width
             },
             methods: {
                 thumbnail_click: function(music_idx, music) {
