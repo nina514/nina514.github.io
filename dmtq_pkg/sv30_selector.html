@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/data.js"></script>
+    <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+
+    <div id="app">
+        <h2>Super Value 30 Package Music List</h2>
+        <div>({{ select_count }} / 30)</div>
+        <ul v-if="music_list.length > 0">
+            <li v-for="(music, idx) in music_list" :id="music.id" style="display: inline-block; margin: 10px;">
+                <ab-music-card :music="music" :idx="idx" @thumbnailclick="thumbnail_click"></ab-music-card>
+            </li>
+        </ul>
+
+        <br>
+        <br>
+        <div style="background: #29282d;">
+            <ul style="width: 900px; margin-left: auto; margin-right: auto;">
+                <li style="display: block; padding: 5px 3px; margin-bottom: 20px; font-size: 25px; color: #fff; border-bottom: 1px solid #121116; box-shadow: 0 2px 0 #36353a;">구입할 30곡을 선택해 주세요.</li>
+                <li v-for="(music, idx) in music_list" :id="music.id" style="display: inline-block; margin: 10px; width: 270px; height: 60px;">
+                    <div
+                            style="display: inline-block; width: 34px; height: 34px;"
+                            :style="{ 'background-image' : 'url(\'img/chk-icon-'+(music.checked?'on':'off')+'.png\')'}">
+                    </div>
+                    <div
+                            style="display: inline-block;">
+                        <span
+                                style="display: block; padding-left: 10px; font-size: 16px; font-weight: bold;"
+                                :style="{'color': (music.checked?'#aefe4c':'#b9b9bb')}">
+                            {{ music.title }}
+                        </span>
+                        <span
+                                style="display: block; padding-left: 10px; font-size: 15px; font-weight: 500;"
+                                :style="{'color': (music.checked?'#557726':'#676769')}">
+                            {{ music.composer }}
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <script>
+        Vue.component('ab-music-card', {
+            props: ['music', 'idx'],
+            data: function() {
+                return {
+                    obj_music: this.music,
+                    music_idx: this.idx
+                }
+            },
+            template: `
+                <div style="display: inline-block; width: 250px;">
+                    <div
+                        :style="{ 'background-image': 'url('+thumbnail_url+')'}"
+                         style="position: relative; width: 250px; height: 130px; background-size: 100% auto; background-position: center center; background-repeat: no-repeat;"
+                         @click="thumbnail_click">
+                        <span style="display: inline-block; font-size: 20px; background: #fff; border-radius: 3px; margin: 5px;">{{ obj_music.id }}</span>
+                        <span style="position: absolute; display: inline-block; right: 0; width: 20px; background: #fff; border-radius: 3px; margin: 5px;"><input type="checkbox" :value="music.id" :checked="music.checked" disabled></span>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <div>
+                            <span :style="{'font-weight':(obj_music.checked?'bold':''), color: (obj_music.checked?'red':'') }">{{ obj_music.id }}. {{ obj_music.title }}</span><br>
+                        </div>
+                        <div style="text-align: center">
+                            <a v-if="obj_music.url.hasOwnProperty('youtube')" :href="obj_music.url.youtube" target="_blank">
+                                <img src="img/YouTube-icon.png" alt="wiki icon" style="width: 30px; height: 30px;">
+                            </a>
+                            <a v-if="obj_music.url.hasOwnProperty('wiki')" :href="obj_music.url.wiki" target="_blank">
+                                <img src="img/namu-wiki-icon.png" alt="wiki icon" style="width: 30px; height: 30px;">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `,
+            computed: {
+                thumbnail_url: function() {
+                    var obj = this.obj_music
+                    return 'img/music_thumb/'+encodeURIComponent((obj.hasOwnProperty('thumbnail')?obj.thumbnail:obj.title.toLowerCase().replace(/ /g, '_')+'.jpg'))
+                }
+            },
+            methods: {
+                thumbnail_click: function(event) {
+                    this.$emit('thumbnailclick', this.music_idx, this.obj_music)
+                }
+            }
+        })
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                music_list: music_pkg.pack_3,
+                select_count: 0,
+            },
+            methods: {
+                thumbnail_click: function(music_idx, music) {
+                    var checked = music.checked;
+                    if(!checked && this.music_list.filter(function(item) { return item.checked; }).length >= 30) {
+                        alert('음악을 30곡 모두 선택하였습니다.');
+                        return;
+                    }
+
+                    music.checked = !music.checked;
+                    this.select_count = this.music_list.filter(function(item) { return item.checked; }).length;
+                }
+            }
+        })
+
+    </script>
+</body>
+</html>
